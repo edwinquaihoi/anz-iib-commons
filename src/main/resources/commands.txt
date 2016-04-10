@@ -1,0 +1,2 @@
+# setting JMX on Integrater Server VM
+mqsichangeproperties Node01 -e svr1 -o ComIbmJVMManager -n jvmSystemProperty -v"-Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.ssl=fale -Dcom.sun.management.jmxremote.authenticate=false"
