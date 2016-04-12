@@ -11,7 +11,7 @@ import com.ibm.broker.plugin.MbElement;
 import com.ibm.broker.plugin.MbMessage;
 import com.ibm.broker.plugin.MbMessageAssembly;
 
-public class BlobTransformMbJavaComputeNode extends CommonMbJavaComputeNode {
+public class JsonTransformMbJavaComputeNode extends CommonMbJavaComputeNode {
 
 	private static Logger logger = LogManager.getLogger();
 
@@ -36,13 +36,13 @@ public class BlobTransformMbJavaComputeNode extends CommonMbJavaComputeNode {
 		logger.error("ccsid="+ccsid.getValueAsString());
 		*/
 		// get json blob from message
-		MbElement jsonBlob = inAssembly.getMessage().getRootElement ().getFirstElementByPath("/BLOB/BLOB");
+		MbElement jsonBlob = inAssembly.getMessage().getRootElement ().getFirstElementByPath("/JSON/Data");
 		//logger.error(jsonBlob);
 		byte[] jsonBlobBytes = new byte[]{};
 		
 		if(jsonBlob != null) {
-			jsonBlobBytes = jsonBlob.toBitstream(null, null, null, 546, 1208, 0);
-			//jsonBlobBytes = DatatypeConverter.parseHexBinary(jsonBlob.getValueAsString());
+			//jsonBlobBytes = jsonBlob.toBitstream(null, null, null, 546, 1208, 0);
+			jsonBlobBytes = DatatypeConverter.parseHexBinary(jsonBlob.getValueAsString());
 			
 			//logger.error(Arrays.toString(DatatypeConverter.parseHexBinary(jsonBlob.getValueAsString())));
 			//logger.error(Arrays.toString(jsonBlobBytes));
@@ -56,11 +56,11 @@ public class BlobTransformMbJavaComputeNode extends CommonMbJavaComputeNode {
 		// update the outMessage json blob
 		// FIXME what happens when no BLOB in message?
 		if(jsonBlob != null) {
-			outMessage.getRootElement().getFirstElementByPath("/BLOB/BLOB").setValue(transformedJsonBlobBytes);			
+			outMessage.getRootElement().getFirstElementByPath("/JSON/Data").setValue(transformedJsonBlobBytes);			
 		} else {
 			// add a blob message
-			MbElement blobParent = outMessage.getRootElement().createElementAsLastChild("BLOB");
-			MbElement blobChild = blobParent.createElementAsLastChild("BLOB");
+			MbElement blobParent = outMessage.getRootElement().createElementAsLastChild("JSON");
+			MbElement blobChild = blobParent.createElementAsLastChild("Data");
 			blobChild.setValue(transformedJsonBlobBytes);			
 		}
 		
@@ -69,5 +69,4 @@ public class BlobTransformMbJavaComputeNode extends CommonMbJavaComputeNode {
 
 		return terminalAssemblyPair;
 	}
-
 }
